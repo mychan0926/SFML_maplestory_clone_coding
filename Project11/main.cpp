@@ -22,7 +22,7 @@ int main()
 	Texture temp_texture;
 	temp_texture.loadFromFile("./texture_asset/mario.png");
 	object player(100,100, temp_texture);
-	View camera(sf::FloatRect(0, 0, 1280, 720));
+	View camera(FloatRect(0, 0, 1280, 720));
 	window.setView(camera);
 	while (window.isOpen())
 	{
@@ -33,14 +33,6 @@ int main()
 			if (e.type == Event::Closed)
 				window.close();
 		}
-
-
-
-
-
-
-
-
 
 		time = clock();
 		time = time / CLOCKS_PER_SEC;
