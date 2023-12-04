@@ -5,6 +5,9 @@
 #include <vector>
 #include <time.h>
 #include <math.h>
+#include <map>
+
+
 using namespace std;
 using namespace sf;
 
