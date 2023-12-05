@@ -19,7 +19,11 @@ private:
 	bool visiable = 1;
 	Texture texture;
 	Sprite objectSprite;
-	int scale = 1;
+	float scalex = 1;
+	float scaley = 1;
+	float center_x=0;
+	float center_y=0;
+
 
 public:
 	double x, y;
@@ -29,7 +33,8 @@ public:
 	void setVisiable(bool input_visiable);
 	void setObjectType(string input_objectType);
 	void setTexture(Texture input_texture);
-	void setScale(int input_scale);
+	void setScale(float input_scalex, float input_scaley);
+	void setCenter(float input_x, float input_y);
 	void apply();
 
 	pair<double, double> getPosition();

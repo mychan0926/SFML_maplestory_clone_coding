@@ -25,11 +25,28 @@ using namespace sf;
 		texture = input_texture;
 		apply();
 	}
+	void object::setScale(float input_scalex, float input_scaley)
+	{
+
+		scalex = input_scalex;
+
+		scaley = input_scaley;
+		apply();
+	}
+	void object::setCenter(float input_x, float input_y)
+	{
+
+		center_x = input_x;
+		center_y = input_x;
+		apply();
+	}
+
 	void object::apply()
 	{
+		objectSprite.setOrigin(center_x,center_y);
 		objectSprite.setPosition(x,y);
 		objectSprite.setTexture(texture);
-		objectSprite.setScale(scale,scale);
+		objectSprite.setScale(scalex,scaley);
 	}
 
 
