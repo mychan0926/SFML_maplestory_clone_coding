@@ -2,10 +2,6 @@
 using namespace std;
 using namespace sf;
 
-void keyPressup();
-void keyPressdown();
-void keyPressright();
-void keyPressleft();
 
 float player_speed = 0;
 float player_acc = 0.15;
@@ -25,9 +21,15 @@ Texture playertx_walk1;
 Texture playertx_walk2;
 Texture playertx_walk3;
 Texture playertx_walk4;
-Texture playertx_attack1;
-Texture playertx_attack2;
-Texture playertx_attack3;
+Texture playertx_attack11;
+Texture playertx_attack12;
+Texture playertx_attack13;
+Texture playertx_attack21;
+Texture playertx_attack22;
+Texture playertx_attack23;
+Texture playertx_attack31;
+Texture playertx_attack32;
+Texture playertx_attack33;
 Texture playertx_jump;
 Texture guitx;
 Texture maptx;
@@ -39,7 +41,7 @@ void player_animate_change()
 {
 	if (state == 0)
 	{
-		player.setTexture(playertx_wait );
+		player.setTexture(playertx_wait);
 		walk_animate = 0;
 		attack_animate = 0;
 	}
@@ -47,6 +49,7 @@ void player_animate_change()
 	{
 		attack_animate = 0;
 		walk_animate++;
+
 		if (walk_animate > 60)
 		{
 
@@ -68,7 +71,6 @@ void player_animate_change()
 		{
 			player.setTexture(playertx_walk4);
 		}
-
 	
 	}
 	else if (state == 2)
@@ -81,6 +83,7 @@ void player_animate_change()
 	{
 		walk_animate = 0;
 		attack_animate++;
+
 		if (attack_animate > 60)
 		{
 			state = 0;
@@ -88,17 +91,64 @@ void player_animate_change()
 		}
 		if (attack_animate == 0)
 		{
-			player.setTexture(playertx_attack1);
+			player.setTexture(playertx_attack11);
 		}
 		if (attack_animate == 20)
 		{
-			player.setTexture(playertx_attack2);
+			player.setTexture(playertx_attack12);
 		}
 		if (attack_animate == 40)
 		{
-			player.setTexture(playertx_attack3);
+			player.setTexture(playertx_attack13);
 		}
 	
+	}
+	else if (state == 4)
+	{
+		walk_animate = 0;
+		attack_animate++;
+
+		if (attack_animate > 60)
+		{
+			state = 0;
+			attack_animate = 0;
+		}
+		if (attack_animate == 0)
+		{
+			player.setTexture(playertx_attack21);
+		}
+		if (attack_animate == 20)
+		{
+			player.setTexture(playertx_attack22);
+		}
+		if (attack_animate == 40)
+		{
+			player.setTexture(playertx_attack23);
+		}
+
+	}
+	else if (state == 5)
+	{
+		walk_animate = 0;
+		attack_animate++;
+		if (attack_animate > 60)
+		{
+			state = 0;
+			attack_animate = 0;
+		}
+		if (attack_animate == 0)
+		{
+			player.setTexture(playertx_attack31);
+		}
+		if (attack_animate == 20)
+		{
+			player.setTexture(playertx_attack32);
+		}
+		if (attack_animate == 40)
+		{
+			player.setTexture(playertx_attack33);
+		}
+
 	}
 }
 
@@ -109,10 +159,10 @@ int main()
 	window.setFramerateLimit(100);
 	Text text;
 	Font font;
-	player.setCenter(player.getSprite().getLocalBounds().width / 2+70, player.getSprite().getLocalBounds().height / 2+90);
-
+	player.setCenter(player.getSprite().getLocalBounds().width / 2+130, player.getSprite().getLocalBounds().height / 2+155);
+	srand(time(NULL));
 	Vector2i mouse_pos;
-	if (!font.loadFromFile("./text_file/arial.ttf"))
+	if (!font.loadFromFile("./text_file/gulim.ttc"))
 	{
 		cout << "can't load font file.";
 		return 0;
@@ -134,9 +184,15 @@ int main()
 	playertx_walk3.loadFromFile("./texture_asset/메이플 에셋/걷기/avatar_walk1(2)_default(0).png");
 	playertx_walk4.loadFromFile("./texture_asset/메이플 에셋/걷기/avatar_walk1(3)_default(0).png");
 	playertx_jump.loadFromFile("./texture_asset/메이플 에셋/점프/avatar_jump(0)_default(0).png");
-	playertx_attack1.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_stand1(2)_default(0).png");
-	playertx_attack2.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_swingO1(1)_default(0).png");
-	playertx_attack3.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_swingO1(2)_default(0).png");
+	playertx_attack11.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_stand1(2)_default(0).png");
+	playertx_attack12.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_swingO1(1)_default(0).png");
+	playertx_attack13.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_swingO1(2)_default(0).png");
+	playertx_attack21.loadFromFile("./texture_asset/메이플 에셋/공격2/avatar_swingO2(0)_default(0).png");
+	playertx_attack22.loadFromFile("./texture_asset/메이플 에셋/공격2/avatar_swingO2(1)_default(0).png");
+	playertx_attack23.loadFromFile("./texture_asset/메이플 에셋/공격2/avatar_swingO2(2)_default(0).png");
+	playertx_attack31.loadFromFile("./texture_asset/메이플 에셋/공격3/avatar_swingO3(0)_default(0).png");
+	playertx_attack32.loadFromFile("./texture_asset/메이플 에셋/공격3/avatar_swingO3(1)_default(0).png");
+	playertx_attack33.loadFromFile("./texture_asset/메이플 에셋/공격3/avatar_swingO3(2)_default(0).png");
 
 
 
@@ -158,24 +214,24 @@ int main()
 	RectangleShape crash;
 	crash.setSize(Vector2f(15, 5));
 
-	crash.setFillColor(sf::Color(255, 255, 255, 0));
+	crash.setFillColor(sf::Color(255, 255, 255, 255));
 
 	vector <vector<float>> road_pos;
-	road_pos = { {2000, 100,0, 1035}, {500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790} };
+	road_pos = { {2000, 100,0, 1035}, {500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,520, 612} };
 
-
+	//땅 생성
 	for (int i = 0; i < road_pos.size(); i++)
 	{
 		RectangleShape T_road;
 		T_road.setSize(Vector2f(road_pos[i][0], road_pos[i][1]));
 		T_road.setPosition(Vector2f(road_pos[i][2], road_pos[i][3]));
-		T_road.setFillColor(sf::Color(255, 255, 255, 0));
+		T_road.setFillColor(sf::Color(255, 255, 255, 255));
 		road.push_back(T_road);
 
 	}
 
 
-
+	bool is_road = 0;
 	while (window.isOpen())
 	{
 		Event e;
@@ -191,7 +247,7 @@ int main()
 
 				if (!crash.getGlobalBounds().intersects(road[0].getGlobalBounds()))
 				{
-					if (!jumped && state != 3) //점프중이 아니면
+					if (!jumped && state != 3 && state != 4 && state != 5) //점프중이 아니면
 					{
 						player_speed -= 2;
 						jumped = 1;
@@ -200,13 +256,11 @@ int main()
 				}
 				else//19 24
 				{
-					if (!jumped&&state!=3) //점프중이 아니면
+					if (!jumped && state != 3 && state != 4 && state != 5) //점프중이 아니면
 					{
 						player_speed -= 2;
 						jumped = 1;
 						jump_counting = 0;
-
-
 					}
 
 				}
@@ -225,7 +279,7 @@ int main()
 		}
 
 		if (Keyboard::isKeyPressed(Keyboard::E)) {
-			if (state != 2&&state!=3)
+			if (state != 2&&state!=3 && state != 4 && state != 5)
 			{
 				state = 3;
 			}
@@ -244,13 +298,15 @@ int main()
 		}
 		player.setPosition(player.x, player.y + player_speed);
 
+
+		is_road = 0;
 		//땅 충돌 처리
 		{
 
 			if (crash.getGlobalBounds().intersects(road[0].getGlobalBounds()))
 			{
 
-
+				is_road = 1;
 				jumped = 0;
 				jump_counting = 200;
 				player_speed = 0;
@@ -264,7 +320,7 @@ int main()
 
 					if (down_counting > 50)
 					{
-
+						is_road = 1;
 						jumped = 0;
 						jump_counting = 200;
 						player_speed = 0;
@@ -275,8 +331,9 @@ int main()
 
 		}
 
+		//점프 물리 엔진
 
-		if (jumped)
+		if (!is_road)
 		{
 			one_count = 1;
 			state = 2;
@@ -299,12 +356,15 @@ int main()
 
 
 
-		if (Keyboard::isKeyPressed(Keyboard::Up)) {
+		if (Keyboard::isKeyPressed(Keyboard::Up)) 
+		{
+
+
 
 		}
-
-
-		else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+		else if (Keyboard::isKeyPressed(Keyboard::Down)) 
+		
+		{
 
 		}
 
@@ -312,9 +372,8 @@ int main()
 
 
 		if (Keyboard::isKeyPressed(Keyboard::Left)) {
-			if (state != 3)
+			if (state != 3 && state != 4 && state != 5)
 			{
-
 
 				player.setScale(1.f, 1.f);
 				player.setPosition(player.x - 2, player.y);
@@ -326,7 +385,7 @@ int main()
 			}
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::Right)) {
-			if (state != 3)
+			if (state != 3 && state != 4 && state != 5)
 			{
 
 				player.setScale(-1.f, 1.f);
@@ -340,7 +399,7 @@ int main()
 		}
 		else
 		{
-			if (state != 2&&state!=3)
+			if (state != 2 && state != 3 && state != 4 && state != 5)
 			{
 				state = 0;
 			}
@@ -373,7 +432,7 @@ int main()
 			float posInView_y = camera.getCenter().y - camera.getSize().y / 2;
 
 			text.setPosition(posInView_x, posInView_y);
-			text.setString(to_string(player.x) + ' ' + to_string(player.y) + ' ' + to_string(!crash.getGlobalBounds().intersects(road[0].getGlobalBounds())));
+			text.setString(to_string(player.x) + ' ' + to_string(player.y) + ' ' + to_string(state));
 			GUI_background.setPosition(posInView_x, posInView_y + 530);
 			GUI.setPosition(posInView_x, posInView_y + 530);
 			crash.setPosition(Vector2f(player.x - 14, player.y + 10 + player_speed));
