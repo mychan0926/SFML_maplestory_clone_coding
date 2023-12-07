@@ -22,30 +22,36 @@ using namespace sf;
 	}
 	void object::setTexture(Texture input_texture)
 	{
+
 		texture = input_texture;
+
 		apply();
 	}
 	void object::setScale(float input_scalex, float input_scaley)
 	{
 
 		scalex = input_scalex;
-
 		scaley = input_scaley;
+
 		apply();
 	}
 	void object::setCenter(float input_x, float input_y)
 	{
 
 		center_x = input_x;
-		center_y = input_x;
+		center_y = input_y;
 		apply();
 	}
 
 	void object::apply()
 	{
+		objectSprite.setTexture(texture);
+		objectSprite.setTextureRect({ 0,0, int(objectSprite.getTexture()->getSize().x), int(objectSprite.getTexture()->getSize().y) });
 		objectSprite.setOrigin(center_x,center_y);
 		objectSprite.setPosition(x,y);
-		objectSprite.setTexture(texture);
+
+
+
 		objectSprite.setScale(scalex,scaley);
 	}
 

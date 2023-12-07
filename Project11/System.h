@@ -37,6 +37,7 @@ public:
 	void setCenter(float input_x, float input_y);
 	void apply();
 
+	pair <float, float> getScale();
 	pair<double, double> getPosition();
 	bool getVisiable();
 	string getObjectType();
