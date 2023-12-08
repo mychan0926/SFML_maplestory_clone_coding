@@ -45,3 +45,38 @@ public:
 
 };
 
+class monster : public object
+{
+private:
+	int hp;
+	int damage;
+	int startx;
+	int endx;
+public:
+	int move_counting = 0;
+	int die_counting = 0;
+	int targetx = 0;
+	int T_clock = 100;
+	int A_clock = 0;
+	vector <Texture> monster_texture;
+
+	monster(double input_x, double input_y, Texture input_texture) : object(input_x, input_y, input_texture) { apply(); schedule(); }
+	void setHp(int input_hp);
+	void move_animate();
+	void setDamage(int input_damage);
+	void setStartx(int input_startx);
+	void setEndx(int input_endx);
+	void move(int input_gox);
+	void die();
+	void schedule();
+
+
+	int getHp();
+	int getDamage();
+	int getStartx();
+	int getEndx();
+
+
+
+
+};

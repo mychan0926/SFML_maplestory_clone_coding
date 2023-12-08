@@ -31,6 +31,10 @@ Texture maptx;
 Texture guibacktx;
 Texture playertx_rope1;
 Texture playertx_rope2;
+Texture monster_move1;
+Texture monster_move2;
+Texture monster_move3;
+Texture monster_back;
 //==============================
 Texture playertx_attack21;
 Texture playertx_attack22;
@@ -95,7 +99,7 @@ void player_animate_change()
 		rope_animate = 0;
 		attack_animate++;
 
-		if (attack_animate > 60)
+		if (attack_animate > 80)
 		{
 			state = 0;
 			attack_animate = 0;
@@ -173,6 +177,11 @@ int main()
 	playertx_rope1.loadFromFile("./texture_asset/메이플 에셋/로프/avatar_rope(0)_default(0).png");
 	playertx_rope2.loadFromFile("./texture_asset/메이플 에셋/로프/avatar_rope(1)_default(0).png");
 
+
+	monster_move1.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/0.png");
+	monster_move2.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/1.png");
+	monster_move3.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/2.png");
+	monster_back.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/3.png");
 	maptx.loadFromFile("./texture_asset/map.png");
 	guitx.loadFromFile("./texture_asset/level.png");
 	guibacktx.loadFromFile("./texture_asset/_outlink.png");
@@ -193,15 +202,17 @@ int main()
 	vector <vector<float>> ladder_pos;
 	ladder_pos = { {45,180,710,790}, {45,180,1310,790}, {45,120,600,612}, {45,120,1190,612} , {45,120,925, 432} , {45,120,1075, 252} };
 
+	vector <monster> monster_vector;
+	vector <vector<float>> 	monster_pos;
+	monster_pos = {{500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,520, 612},{130, 10,970, 612},{310, 10,1150, 612} ,{310, 10,700, 432} ,{220, 10,1060, 432},{310, 10,880, 252} };
 
 	RectangleShape crash;
 	RectangleShape rope_crash;
-
 	crash.setSize(Vector2f(7, 5));
 	rope_crash.setSize(Vector2f(7, 5));
 
-	crash.setFillColor(sf::Color(255, 255, 255, 255));
-
+	crash.setFillColor(sf::Color(255, 255, 255, 0));
+	rope_crash.setFillColor(sf::Color(255, 255, 255, 0));
 	
 
 	//땅 생성
@@ -210,17 +221,35 @@ int main()
 		RectangleShape T_road;
 		T_road.setSize(Vector2f(road_pos[i][0], road_pos[i][1]));
 		T_road.setPosition(Vector2f(road_pos[i][2], road_pos[i][3]));
-		T_road.setFillColor(sf::Color(255, 255, 255, 255));
+		T_road.setFillColor(sf::Color(255, 255, 255, 0));
 		road.push_back(T_road);
 
 	}
+	//로프 생성
 	for (int i = 0; i < ladder_pos.size(); i++)
 	{
 		RectangleShape T_ladder;
 		T_ladder.setSize(Vector2f(ladder_pos[i][0]-10, ladder_pos[i][1]));
 		T_ladder.setPosition(Vector2f(ladder_pos[i][2]+5, ladder_pos[i][3]+1));
-		T_ladder.setFillColor(sf::Color(0, 0, 255, 255));
+		T_ladder.setFillColor(sf::Color(0, 0, 255, 0));
 		ladder.push_back(T_ladder);
+
+	}
+	//몬스터 생성
+	for (int i = 0; i < monster_pos.size(); i++)
+	{
+		monster T_monster((monster_pos[i][2]), (monster_pos[i][3]-60),monster_move1);
+		T_monster.setStartx(monster_pos[i][2]);
+		T_monster.setEndx(monster_pos[i][2]+ monster_pos[i][0]-50);
+		T_monster.targetx = monster_pos[i][2];
+		T_monster.setHp(100);
+		T_monster.setDamage(10);
+		T_monster.monster_texture.push_back(monster_move1);
+		T_monster.monster_texture.push_back(monster_move2);
+		T_monster.monster_texture.push_back(monster_move3);
+		T_monster.monster_texture.push_back(monster_back);
+		T_monster.setCenter(T_monster.getSprite().getLocalBounds().width / 2, T_monster.getSprite().getLocalBounds().height / 230);
+		monster_vector.push_back(T_monster);
 
 	}
 
@@ -230,7 +259,7 @@ int main()
 		Event e;
 		while (window.pollEvent(e)) {
 			if (e.type == Event::Closed)
-				window.close();
+	 			window.close();
 		}
 
 
@@ -238,7 +267,7 @@ int main()
 
 			if (Keyboard::isKeyPressed(Keyboard::Down)) { //키를 누르고, 아래바닥이 아니면
 
-				if (!crash.getGlobalBounds().intersects(road[0].getGlobalBounds()))
+  				if (!crash.getGlobalBounds().intersects(road[0].getGlobalBounds()))
 				{
 					if (!jumped && state != 3&&state!=4) //점프,공격,줄타기 중이 아니면
 					{
@@ -302,7 +331,7 @@ int main()
 					player.setScale(-1.f, 1.f);
 					player_animate_change();
 					rope_animate++;
-					player.setPosition(player.x , player.y - 2);
+					player.setPosition(player.x , player.y - 1.5);
 				}
 				else
 				{
@@ -338,7 +367,7 @@ int main()
 					player.setScale(-1.f, 1.f);
 					player_animate_change();
 					rope_animate++;
-					player.setPosition(player.x, player.y + 2);
+					player.setPosition(player.x, player.y + 1.5);
 				}
 				else
 				{
@@ -365,7 +394,7 @@ int main()
 					player.setScale(-1.f, 1.f);
 					player_animate_change();
 					rope_animate++;
-					player.setPosition(player.x, player.y + 2);
+					player.setPosition(player.x, player.y + 1.5);
 				}
 				else
 				{
@@ -460,7 +489,7 @@ int main()
 			{
 
 				player.setScale(1.f, 1.f);
-				player.setPosition(player.x - 2, player.y);
+				player.setPosition(player.x - 1.5, player.y);
 
 				if (state != 2)
 				{
@@ -482,7 +511,7 @@ int main()
 			{
 
 				player.setScale(-1.f, 1.f);
-				player.setPosition(player.x + 2, player.y);
+				player.setPosition(player.x + 1.5, player.y);
 
 				if (state != 2)
 				{
@@ -566,6 +595,14 @@ int main()
 			for (int i = 0; i < ladder.size(); i++)
 			{
 				window.draw(ladder[i]);
+			}
+
+			for (int i = 0; i < monster_vector.size(); i++)
+			{
+
+				monster_vector[i].schedule();
+				window.draw(monster_vector[i].getSprite());
+
 			}
 
 			window.draw(player.getSprite());

@@ -55,6 +55,122 @@ using namespace sf;
 		objectSprite.setScale(scalex,scaley);
 	}
 
+	void monster::setHp(int input_hp)
+	{
+		hp = input_hp;
+	}
+
+	void monster::setDamage(int input_damage)
+	{
+		damage = input_damage;
+	}
+
+	void monster::setStartx(int input_startx)
+	{
+		startx = input_startx;
+	}
+
+	void monster::setEndx(int input_endx)
+	{
+		endx = input_endx;
+	}
+
+	int monster::getHp()
+	{
+		return hp;
+	}
+
+	int monster::getDamage()
+	{
+		return damage;
+	}
+
+	int monster::getStartx()
+	{
+		return startx;
+	}
+
+	int monster::getEndx()
+	{
+		return endx;
+	}
+
+	void monster::move(int input_gox)
+	{
+		if (x != input_gox)
+		{
+			if (x < input_gox)
+			{
+				setPosition(x + 1, y);
+				setScale(-1,1);
+			}
+			else
+			{
+				setPosition(x - 1, y);
+				setScale(1, 1);
+			}
+			move_animate();
+		}
+		else
+		{
+			move_counting = 1;
+			setTexture(monster_texture[0]);
+		}
+		
+	}
+	void monster::die()
+	{
+
+	}
+	void monster::move_animate()
+	{
+		if (A_clock == 90)
+		{
+			A_clock = 0;
+		}
+		if (A_clock == 0)
+		{
+			setTexture(monster_texture[0]);
+		}
+		if (A_clock == 30)
+		{
+			setTexture(monster_texture[1]);
+		}
+		if (A_clock == 60)
+		{
+			setTexture(monster_texture[2]);
+		}
+
+		A_clock++;
+	}
+
+	void monster::schedule()
+	{
+		if (hp <= 0)
+		{
+			die();
+		}
+		else
+		{
+			if (T_clock == 200)
+			{
+				move(targetx);
+				if (move_counting)
+				{
+					targetx = startx + rand() % (endx - startx);
+					T_clock = 1;
+					move_counting = 0;
+				}
+
+			}
+			else
+			{
+				T_clock++;
+			}
+
+		}
+	
+	}
 
 
 	pair<double, double> object:: getPosition()
