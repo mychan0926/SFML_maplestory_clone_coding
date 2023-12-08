@@ -4,7 +4,7 @@ using namespace sf;
 
 
 float player_speed = 0;
-float player_acc = 0.15;
+float player_acc = 0.18;
 float playertx_sizex = 1;
 float playertx_sizey = 1;
 bool jumped = 1;
@@ -13,9 +13,10 @@ int jump_counting = 0;
 int down_counting = 200;
 int walk_animate = 0;
 int attack_animate = 0;
+int rope_animate = 0;
 bool one_count = 0;
 int rotate = 1;
-
+int is_rope = 0;
 Texture playertx_wait;
 Texture playertx_walk1;
 Texture playertx_walk2;
@@ -24,16 +25,22 @@ Texture playertx_walk4;
 Texture playertx_attack11;
 Texture playertx_attack12;
 Texture playertx_attack13;
+Texture playertx_jump;
+Texture guitx;
+Texture maptx;
+Texture guibacktx;
+Texture playertx_rope1;
+Texture playertx_rope2;
+//==============================
 Texture playertx_attack21;
 Texture playertx_attack22;
 Texture playertx_attack23;
 Texture playertx_attack31;
 Texture playertx_attack32;
 Texture playertx_attack33;
-Texture playertx_jump;
-Texture guitx;
-Texture maptx;
-Texture guibacktx;
+
+//=============================
+
 
 object player(500, 500, playertx_wait);
 
@@ -44,10 +51,12 @@ void player_animate_change()
 		player.setTexture(playertx_wait);
 		walk_animate = 0;
 		attack_animate = 0;
+		rope_animate = 0;
 	}
 	else if (state == 1)
 	{
 		attack_animate = 0;
+		rope_animate = 0;
 		walk_animate++;
 
 		if (walk_animate > 60)
@@ -78,10 +87,12 @@ void player_animate_change()
 		player.setTexture(playertx_jump);
 		walk_animate = 0;
 		attack_animate = 0;
+		rope_animate = 0;
 	}
 	else if (state == 3)
 	{
 		walk_animate = 0;
+		rope_animate = 0;
 		attack_animate++;
 
 		if (attack_animate > 60)
@@ -106,49 +117,21 @@ void player_animate_change()
 	else if (state == 4)
 	{
 		walk_animate = 0;
-		attack_animate++;
+		attack_animate = 0;
 
-		if (attack_animate > 60)
-		{
-			state = 0;
-			attack_animate = 0;
-		}
-		if (attack_animate == 0)
-		{
-			player.setTexture(playertx_attack21);
-		}
-		if (attack_animate == 20)
-		{
-			player.setTexture(playertx_attack22);
-		}
-		if (attack_animate == 40)
-		{
-			player.setTexture(playertx_attack23);
-		}
 
-	}
-	else if (state == 5)
-	{
-		walk_animate = 0;
-		attack_animate++;
-		if (attack_animate > 60)
+		if (rope_animate > 60)
 		{
-			state = 0;
-			attack_animate = 0;
+			rope_animate = 0;
 		}
-		if (attack_animate == 0)
+		if (rope_animate == 0)
 		{
-			player.setTexture(playertx_attack31);
+			player.setTexture(playertx_rope1);
 		}
-		if (attack_animate == 20)
+		if (rope_animate == 30)
 		{
-			player.setTexture(playertx_attack32);
+			player.setTexture(playertx_rope2);
 		}
-		if (attack_animate == 40)
-		{
-			player.setTexture(playertx_attack33);
-		}
-
 	}
 }
 
@@ -159,7 +142,7 @@ int main()
 	window.setFramerateLimit(100);
 	Text text;
 	Font font;
-	player.setCenter(player.getSprite().getLocalBounds().width / 2+130, player.getSprite().getLocalBounds().height / 2+155);
+	player.setCenter(player.getSprite().getLocalBounds().width / 2+132, player.getSprite().getLocalBounds().height / 2+155);
 	srand(time(NULL));
 	Vector2i mouse_pos;
 	if (!font.loadFromFile("./text_file/gulim.ttc"))
@@ -187,14 +170,8 @@ int main()
 	playertx_attack11.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_stand1(2)_default(0).png");
 	playertx_attack12.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_swingO1(1)_default(0).png");
 	playertx_attack13.loadFromFile("./texture_asset/메이플 에셋/공격1/avatar_swingO1(2)_default(0).png");
-	playertx_attack21.loadFromFile("./texture_asset/메이플 에셋/공격2/avatar_swingO2(0)_default(0).png");
-	playertx_attack22.loadFromFile("./texture_asset/메이플 에셋/공격2/avatar_swingO2(1)_default(0).png");
-	playertx_attack23.loadFromFile("./texture_asset/메이플 에셋/공격2/avatar_swingO2(2)_default(0).png");
-	playertx_attack31.loadFromFile("./texture_asset/메이플 에셋/공격3/avatar_swingO3(0)_default(0).png");
-	playertx_attack32.loadFromFile("./texture_asset/메이플 에셋/공격3/avatar_swingO3(1)_default(0).png");
-	playertx_attack33.loadFromFile("./texture_asset/메이플 에셋/공격3/avatar_swingO3(2)_default(0).png");
-
-
+	playertx_rope1.loadFromFile("./texture_asset/메이플 에셋/로프/avatar_rope(0)_default(0).png");
+	playertx_rope2.loadFromFile("./texture_asset/메이플 에셋/로프/avatar_rope(1)_default(0).png");
 
 	maptx.loadFromFile("./texture_asset/map.png");
 	guitx.loadFromFile("./texture_asset/level.png");
@@ -209,15 +186,23 @@ int main()
 	object GUI(500, 500, guitx);
 	object GUI_background(500, 500, guibacktx);
 	vector <RectangleShape> road;
+	vector <vector<float>> road_pos;
+	road_pos = { {2000, 100,0, 1035}, {500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,520, 612},{130, 10,970, 612},{310, 10,1150, 612} ,{310, 10,700, 432} ,{220, 10,1060, 432},{310, 10,880, 252} };
+	//sizex, sizey, x, y
+	vector <RectangleShape> ladder;
+	vector <vector<float>> ladder_pos;
+	ladder_pos = { {45,180,710,790}, {45,180,1310,790}, {45,120,600,612}, {45,120,1190,612} , {45,120,925, 432} , {45,120,1075, 252} };
 
 
 	RectangleShape crash;
-	crash.setSize(Vector2f(15, 5));
+	RectangleShape rope_crash;
+
+	crash.setSize(Vector2f(7, 5));
+	rope_crash.setSize(Vector2f(7, 5));
 
 	crash.setFillColor(sf::Color(255, 255, 255, 255));
 
-	vector <vector<float>> road_pos;
-	road_pos = { {2000, 100,0, 1035}, {500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,520, 612} };
+	
 
 	//땅 생성
 	for (int i = 0; i < road_pos.size(); i++)
@@ -229,7 +214,15 @@ int main()
 		road.push_back(T_road);
 
 	}
+	for (int i = 0; i < ladder_pos.size(); i++)
+	{
+		RectangleShape T_ladder;
+		T_ladder.setSize(Vector2f(ladder_pos[i][0]-10, ladder_pos[i][1]));
+		T_ladder.setPosition(Vector2f(ladder_pos[i][2]+5, ladder_pos[i][3]+1));
+		T_ladder.setFillColor(sf::Color(0, 0, 255, 255));
+		ladder.push_back(T_ladder);
 
+	}
 
 	bool is_road = 0;
 	while (window.isOpen())
@@ -247,7 +240,7 @@ int main()
 
 				if (!crash.getGlobalBounds().intersects(road[0].getGlobalBounds()))
 				{
-					if (!jumped && state != 3 && state != 4 && state != 5) //점프중이 아니면
+					if (!jumped && state != 3&&state!=4) //점프,공격,줄타기 중이 아니면
 					{
 						player_speed -= 2;
 						jumped = 1;
@@ -256,7 +249,7 @@ int main()
 				}
 				else//19 24
 				{
-					if (!jumped && state != 3 && state != 4 && state != 5) //점프중이 아니면
+					if (!jumped && state != 3 && state != 4) //점프,공격,줄타기 중이 아니면
 					{
 						player_speed -= 2;
 						jumped = 1;
@@ -268,7 +261,7 @@ int main()
 			}
 			else
 			{
-				if (!jumped)
+				if (!jumped && state != 3 && state != 4)
 				{
 					player_speed -= 4;
 					jumped = 1;
@@ -278,13 +271,109 @@ int main()
 
 		}
 
+		is_rope = 0;
 		if (Keyboard::isKeyPressed(Keyboard::E)) {
-			if (state != 2&&state!=3 && state != 4 && state != 5)
+			if (state != 2&&state!=3 && state != 4)
 			{
 				state = 3;
 			}
 		}
+		if (Keyboard::isKeyPressed(Keyboard::Up))
+		{
+			//로프 충돌 처리
+			if(jumped)
+			{
 
+				for (int i = 0; i < ladder.size(); i++)
+				{
+					if (crash.getGlobalBounds().intersects(ladder[i].getGlobalBounds()))
+					{
+						player.setPosition(ladder[i].getPosition().x + ladder[i].getSize().x / 2 - 3, player.y);
+						jump_counting = 200;
+						player_speed = 0;
+						down_counting = 200;
+						state = 4;
+						is_rope = 1;
+						jumped = 1;
+					}
+				}
+				if (is_rope)
+				{
+					player.setScale(-1.f, 1.f);
+					player_animate_change();
+					rope_animate++;
+					player.setPosition(player.x , player.y - 2);
+				}
+				else
+				{
+					state = 0;
+				}
+
+			}
+
+
+
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::Down))
+
+		{
+			//로프 충돌 처리
+			if (jumped)
+			{
+				
+				for (int i = 0; i < ladder.size(); i++)
+				{
+					if (crash.getGlobalBounds().intersects(ladder[i].getGlobalBounds()))
+					{
+						player.setPosition(ladder[i].getPosition().x+ ladder[i].getSize().x/2-3, player.y);
+						jump_counting = 200;
+						player_speed = 0;
+						down_counting = 200;
+						state = 4;
+						is_rope = 1;
+					}
+				}
+				if (is_rope)
+				{
+					player.setScale(-1.f, 1.f);
+					player_animate_change();
+					rope_animate++;
+					player.setPosition(player.x, player.y + 2);
+				}
+				else
+				{
+					state = 0;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < ladder.size(); i++)
+				{
+					if (rope_crash.getGlobalBounds().intersects(ladder[i].getGlobalBounds()))
+					{
+						player.setPosition(ladder[i].getPosition().x + ladder[i].getSize().x / 2 - 3, player.y);
+						jump_counting = 200;
+						player_speed = 0;
+						down_counting = 200;
+						state = 4;
+						is_rope = 1;
+						jumped = 1;
+					}
+				}
+				if (is_rope)
+				{
+					player.setScale(-1.f, 1.f);
+					player_animate_change();
+					rope_animate++;
+					player.setPosition(player.x, player.y + 2);
+				}
+				else
+				{
+					state = 0;
+				}
+
+			}
+		}
 
 		jump_counting++;
 		down_counting++;
@@ -318,7 +407,7 @@ int main()
 				if (crash.getGlobalBounds().intersects(road[i].getGlobalBounds()))
 				{
 
-					if (down_counting > 50)
+					if (down_counting > 50&&state!=4)
 					{
 						is_road = 1;
 						jumped = 0;
@@ -331,14 +420,18 @@ int main()
 
 		}
 
+
+
+
 		//점프 물리 엔진
 
 		if (!is_road)
 		{
 			one_count = 1;
-			state = 2;
-			if (jump_counting > 10)
+
+			if (jump_counting > 10&&state != 4)
 			{
+				state = 2;
 				player_speed += player_acc;
 			}
 		}
@@ -348,6 +441,7 @@ int main()
 			if (one_count == 1)
 			{
 				one_count = 0;
+				player_animate_change();
 				state = 0;
 			}
 			player_speed = 0;
@@ -356,23 +450,13 @@ int main()
 
 
 
-		if (Keyboard::isKeyPressed(Keyboard::Up)) 
-		{
 
-
-
-		}
-		else if (Keyboard::isKeyPressed(Keyboard::Down)) 
-		
-		{
-
-		}
 
 
 
 
 		if (Keyboard::isKeyPressed(Keyboard::Left)) {
-			if (state != 3 && state != 4 && state != 5)
+			if (state != 3 && state != 4)
 			{
 
 				player.setScale(1.f, 1.f);
@@ -383,9 +467,18 @@ int main()
 					state = 1;
 				}
 			}
+			else if (state == 4&& !Keyboard::isKeyPressed(Keyboard::Up) && !Keyboard::isKeyPressed(Keyboard::Down))
+			{
+				if (Keyboard::isKeyPressed(Keyboard::Space)) {
+
+					state = 2;
+					player_speed -= 3;
+
+				}
+			}
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::Right)) {
-			if (state != 3 && state != 4 && state != 5)
+			if (state != 3 && state != 4)
 			{
 
 				player.setScale(-1.f, 1.f);
@@ -396,10 +489,19 @@ int main()
 					state = 1;
 				}
 			}
+			else if (state == 4 && !Keyboard::isKeyPressed(Keyboard::Up) && !Keyboard::isKeyPressed(Keyboard::Down))
+			{
+				if (Keyboard::isKeyPressed(Keyboard::Space)) {
+
+					state = 2;
+					player_speed -= 3;
+
+				}
+			}
 		}
 		else
 		{
-			if (state != 2 && state != 3 && state != 4 && state != 5)
+			if (state != 2 && state != 3 && state != 4)
 			{
 				state = 0;
 			}
@@ -415,14 +517,18 @@ int main()
 
 		//카메라 설정
 		{
-		if (player.x- camera.getSize().x / 2 >0&& player.x + camera.getSize().x / 2 < 1980)
+			float camera_tx = camera.getCenter().x + (player.x - camera.getCenter().x) / 60;
+			float camera_ty = camera.getCenter().y + (player.y - camera.getCenter().y) / 60;
+
+
+		if (camera_tx - camera.getSize().x / 2 >0&& camera_tx + camera.getSize().x / 2 < 1980)
 		{
-			camera.setCenter(Vector2f(player.x, camera.getCenter().y));
+			camera.setCenter(Vector2f(camera.getCenter().x+ (player.x-camera.getCenter().x)/60 , camera.getCenter().y));
 		}
 
-		if (player.y - camera.getSize().y / 2 > 0 && player.y + camera.getSize().y / 2 < 1230)
+		if (camera_ty - camera.getSize().y / 2 > 0 && camera_ty + camera.getSize().y / 2 < 1230)
 		{
-			camera.setCenter(Vector2f(camera.getCenter().x,player.y ));
+			camera.setCenter(Vector2f(camera.getCenter().x, camera.getCenter().y + (player.y - camera.getCenter().y) / 60));
 		}
 
 
@@ -435,8 +541,8 @@ int main()
 			text.setString(to_string(player.x) + ' ' + to_string(player.y) + ' ' + to_string(state));
 			GUI_background.setPosition(posInView_x, posInView_y + 530);
 			GUI.setPosition(posInView_x, posInView_y + 530);
-			crash.setPosition(Vector2f(player.x - 14, player.y + 10 + player_speed));
-
+			crash.setPosition(Vector2f(player.x, player.y + 10 + player_speed));
+			rope_crash.setPosition(Vector2f(player.x, player.y + 20));
 
 
 			mouse_pos = Mouse::getPosition(window);
@@ -457,9 +563,14 @@ int main()
 			{
 				window.draw(road[i]);
 			}
+			for (int i = 0; i < ladder.size(); i++)
+			{
+				window.draw(ladder[i]);
+			}
 
 			window.draw(player.getSprite());
 			window.draw(crash);
+			window.draw(rope_crash);
 			window.draw(GUI_background.getSprite());
 			window.draw(GUI.getSprite());
 			window.display();
