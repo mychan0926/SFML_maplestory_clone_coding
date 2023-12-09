@@ -172,7 +172,7 @@ using namespace sf;
 	
 	}
 
-commit	void monster::is_damaged(int input_damage)
+    void monster::is_damaged(int input_damage)
 
 	{
 		hp -= input_damage;
