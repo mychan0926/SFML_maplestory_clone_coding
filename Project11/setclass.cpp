@@ -119,31 +119,36 @@ using namespace sf;
 	}
 	void monster::die()
 	{
-		if (live_clock == 179)
+		if (live_clock == 0)
 		{
-			setTexture(monster_texture[0]);
-			T_clock = 100;
+			killed();
+		}
+
+
+		if (live_clock == 200)
+		{
+			objectSprite.setColor(sf::Color(255, 255, 255,255));
+			T_clock = 200;
 			R_clock = 100;
 			damage_clock = 0;
 			texture_clock = 80;
 			death_clock = 0;
 			damage_trigger = 0;
+			re_clock = 0;
 			live_clock = 0;
 			hp = 100;
+
 		}
 		else
 		{
 			live_clock++;
 		}
-
+		
 		if (live_clock == 40)
 		{
 			setTexture(monster_texture[0]);
 			x = startx + rand() % (endx - startx);
-		}
-		if (live_clock > 50&& live_clock <= 178)
-		{
-			getSprite().setColor(sf::Color(255, 255, 255, (live_clock - 50) * 2));
+
 		}
 
 
@@ -153,9 +158,8 @@ using namespace sf;
 		}
 
 
-	
-
 	}
+
 	void monster::move_animate()
 	{
 		if (A_clock == 90)
@@ -208,6 +212,17 @@ using namespace sf;
 		}
 		else
 		{
+			if (re_clock != 127)
+			{
+				re_clock++;
+				objectSprite.setColor(sf::Color(255, 255, 255, re_clock*2));
+			}
+			else
+			{
+				objectSprite.setColor(sf::Color(255, 255, 255, 255));
+			}
+
+
 			if (texture_clock != 80)
 			{
 				
@@ -294,9 +309,15 @@ using namespace sf;
 
 	bool monster::is_crash(RectangleShape *T)
 	{
+		
 
-		return this->getSprite().getGlobalBounds().intersects(T->getGlobalBounds());
+		return objectSprite.getGlobalBounds().intersects(T->getGlobalBounds());;
 	}
+
+
+
+
+
 
 
 	pair<double, double> object:: getPosition()

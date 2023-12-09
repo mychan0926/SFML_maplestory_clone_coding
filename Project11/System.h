@@ -17,7 +17,7 @@ private:
 	string objectType;
 	bool visiable = 1;
 	Texture texture;
-	Sprite objectSprite;
+
 	float scalex = 1;
 	float scaley = 1;
 	float center_x=0;
@@ -27,7 +27,7 @@ private:
 public:
 	double x, y;
 	object(double input_x, double input_y, Texture input_texture) : x(input_x), y(input_y), texture(input_texture) { apply(); }
-	
+	Sprite objectSprite;
 	void setPosition(double input_x, double input_y);
 	void setVisiable(bool input_visiable);
 	void setObjectType(string input_objectType);
@@ -53,21 +53,24 @@ private:
 	int startx=0;
 	int endx=0;
 public:
+	void (*killed)();
 	int move_counting = 0;
 	int die_counting = 0;
 	int targetx = 0;
-	int T_clock = 100;
+	int T_clock = 200;
 	int R_clock = 100;
 	int A_clock = 0;
 	int live_clock = 0;
 	int damage_clock = 0;
 	int texture_clock = 80;
 	int death_clock = 0;
+	int re_clock = 0;
+
 	bool damage_trigger=0;
 
 	float player_x;
 	float player_y;
-
+	int player_damage = 0;
 
 	RectangleShape* playero;
 	vector <Texture> monster_texture;

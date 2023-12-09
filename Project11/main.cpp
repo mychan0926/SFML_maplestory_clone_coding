@@ -8,6 +8,9 @@ float player_acc = 0.18;
 float playertx_sizex = 1;
 float playertx_sizey = 1;
 bool jumped = 1;
+int player_level = 1;
+int player_EXP = 0;
+int player_damage = 20;
 int state = 0; //0은 서있기, 1은 걷기, 2는 점프
 int jump_counting = 0;
 int down_counting = 200;
@@ -51,6 +54,10 @@ Texture playertx_attack33;
 
 
 object player(500, 500, playertx_wait);
+void d()
+{
+	player_EXP += 20;
+}
 
 void player_animate_change()
 {
@@ -161,7 +168,7 @@ int main()
 
 	text.setFont(font);
 	text.setCharacterSize(20);
-	text.setFillColor(Color::Blue);
+	text.setFillColor(Color::White);
 	View camera(FloatRect(0, 0, 800, 600));
 	window.setView(camera);
 
@@ -227,6 +234,8 @@ int main()
 	rope_crash.setFillColor(sf::Color(255, 255, 255, 100));
 	attach.setFillColor(sf::Color(255, 0, 255, 100));
 
+
+
 	//땅 생성
 	for (int i = 0; i < road_pos.size(); i++)
 	{
@@ -269,9 +278,12 @@ int main()
 		monster_vector.push_back(T_monster);
 		monster_vector[i].setTexture(monster_move1);
 		monster_vector[i].schedule();
+		monster_vector[i].killed = d;
 	}
 
 	bool is_road = 0;
+
+
 	while (window.isOpen())
 	{
 		Event e;
@@ -439,8 +451,9 @@ int main()
 		}
 		player.setPosition(player.x, player.y + player_speed);
 
-
 		is_road = 0;
+
+
 		//땅 충돌 처리
 		{
 
@@ -512,7 +525,10 @@ int main()
 			{
 
 				player_rotate = 1;
-				player.setPosition(player.x - 1.5, player.y);
+				if (player.x>0)
+				{
+					player.setPosition(player.x - 1.5, player.y);
+				}
 
 				if (state != 2)
 				{
@@ -523,8 +539,10 @@ int main()
 			{
 				if (Keyboard::isKeyPressed(Keyboard::Space)) {
 
+
 					state = 2;
 					player_speed -= 3;
+
 
 				}
 			}
@@ -533,9 +551,11 @@ int main()
 			if (state != 3 && state != 4)
 			{
 
-
 				player_rotate = -1;
-				player.setPosition(player.x + 1.5, player.y);
+				if (player.x < map.getSprite().getLocalBounds().width)
+				{
+					player.setPosition(player.x + 1.5, player.y);
+				}
 
 				if (state != 2)
 				{
@@ -570,10 +590,19 @@ int main()
 			player.setScale(-1.f, 1.f);
 		}
 
-	
+
+		
 
 		player_animate_change();
-	
+		
+
+
+		if (player_EXP >= player_level * 20 + 100)
+		{
+			player_EXP -= player_level * 20 + 100;
+			player_level++;
+
+		}
 
 		//카메라 설정
 		{
@@ -597,8 +626,8 @@ int main()
 			float posInView_x = camera.getCenter().x - camera.getSize().x / 2;
 			float posInView_y = camera.getCenter().y - camera.getSize().y / 2;
 
-			text.setPosition(posInView_x, posInView_y);
-			text.setString(to_string(player.x) + ' ' + to_string(player.y) + ' ' + to_string(state));
+			text.setPosition(posInView_x+45, posInView_y+570);
+			text.setString(to_string(player_level));
 			GUI_background.setPosition(posInView_x, posInView_y + 530);
 			GUI.setPosition(posInView_x, posInView_y + 530);
 			crash.setPosition(Vector2f(player.x, player.y + 10 + player_speed));
@@ -639,7 +668,7 @@ int main()
 			window.clear();
 
 			window.draw(map.getSprite());
-			window.draw(text);
+	
 
 			for (int i = 0; i < road.size(); i++)
 			{
@@ -656,9 +685,8 @@ int main()
 				monster_vector[i].schedule();
 				monster_vector[i].player_x = player.x;
 				monster_vector[i].player_y = player.y;
+				monster_vector[i].player_damage = player_level*5+20;
 				window.draw(monster_vector[i].getSprite());
-
-
 
 			}
 
@@ -668,6 +696,7 @@ int main()
 			window.draw(rope_crash);
 			window.draw(GUI_background.getSprite());
 			window.draw(GUI.getSprite());
+			window.draw(text);
 			window.display();
 
 		}
