@@ -15,7 +15,7 @@ int walk_animate = 0;
 int attack_animate = 0;
 int rope_animate = 0;
 bool one_count = 0;
-int rotate = 1;
+int player_rotate = 0;
 int is_rope = 0;
 Texture playertx_wait;
 Texture playertx_walk1;
@@ -35,6 +35,10 @@ Texture monster_move1;
 Texture monster_move2;
 Texture monster_move3;
 Texture monster_back;
+Texture monster_damaged;
+Texture monster_die1;
+Texture monster_die2;
+Texture monster_die3;
 //==============================
 Texture playertx_attack21;
 Texture playertx_attack22;
@@ -182,6 +186,9 @@ int main()
 	monster_move2.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/1.png");
 	monster_move3.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/2.png");
 	monster_back.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/3.png");
+	monster_die1.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/10.png");
+	monster_die2.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/11.png");
+	monster_die3.loadFromFile("./texture_asset/메이플 에셋/몬스터/주황버섯/12.png");
 	maptx.loadFromFile("./texture_asset/map.png");
 	guitx.loadFromFile("./texture_asset/level.png");
 	guibacktx.loadFromFile("./texture_asset/_outlink.png");
@@ -208,12 +215,17 @@ int main()
 
 	RectangleShape crash;
 	RectangleShape rope_crash;
+	RectangleShape attach;
+
+
 	crash.setSize(Vector2f(7, 5));
 	rope_crash.setSize(Vector2f(7, 5));
+	attach.setSize(Vector2f(100, 50));
 
-	crash.setFillColor(sf::Color(255, 255, 255, 0));
-	rope_crash.setFillColor(sf::Color(255, 255, 255, 0));
-	
+
+	crash.setFillColor(sf::Color(255, 255, 255, 100));
+	rope_crash.setFillColor(sf::Color(255, 255, 255, 100));
+	attach.setFillColor(sf::Color(255, 0, 255, 100));
 
 	//땅 생성
 	for (int i = 0; i < road_pos.size(); i++)
@@ -221,7 +233,7 @@ int main()
 		RectangleShape T_road;
 		T_road.setSize(Vector2f(road_pos[i][0], road_pos[i][1]));
 		T_road.setPosition(Vector2f(road_pos[i][2], road_pos[i][3]));
-		T_road.setFillColor(sf::Color(255, 255, 255, 0));
+		T_road.setFillColor(sf::Color(255, 255, 255, 100));
 		road.push_back(T_road);
 
 	}
@@ -231,7 +243,7 @@ int main()
 		RectangleShape T_ladder;
 		T_ladder.setSize(Vector2f(ladder_pos[i][0]-10, ladder_pos[i][1]));
 		T_ladder.setPosition(Vector2f(ladder_pos[i][2]+5, ladder_pos[i][3]+1));
-		T_ladder.setFillColor(sf::Color(0, 0, 255, 0));
+		T_ladder.setFillColor(sf::Color(0, 0, 255, 100));
 		ladder.push_back(T_ladder);
 
 	}
@@ -244,14 +256,19 @@ int main()
 		T_monster.targetx = monster_pos[i][2];
 		T_monster.setHp(100);
 		T_monster.setDamage(10);
+		T_monster.playero=&attach;
 		T_monster.monster_texture.push_back(monster_move1);
 		T_monster.monster_texture.push_back(monster_move2);
 		T_monster.monster_texture.push_back(monster_move3);
 		T_monster.monster_texture.push_back(monster_back);
-		T_monster.setTexture(monster_move1);
+		T_monster.monster_texture.push_back(monster_damaged);
+		T_monster.monster_texture.push_back(monster_die1);
+		T_monster.monster_texture.push_back(monster_die2);
+		T_monster.monster_texture.push_back(monster_die3);
 		T_monster.setCenter(T_monster.getSprite().getLocalBounds().width / 2, T_monster.getSprite().getLocalBounds().height / 230);
 		monster_vector.push_back(T_monster);
-
+		monster_vector[i].setTexture(monster_move1);
+		monster_vector[i].schedule();
 	}
 
 	bool is_road = 0;
@@ -331,6 +348,7 @@ int main()
 				}
 				if (is_rope)
 				{
+					player_rotate = -1;
 					player.setScale(-1.f, 1.f);
 					player_animate_change();
 					rope_animate++;
@@ -367,6 +385,7 @@ int main()
 				}
 				if (is_rope)
 				{
+					player_rotate = -1;
 					player.setScale(-1.f, 1.f);
 					player_animate_change();
 					rope_animate++;
@@ -394,6 +413,7 @@ int main()
 				}
 				if (is_rope)
 				{
+					player_rotate = -1;
 					player.setScale(-1.f, 1.f);
 					player_animate_change();
 					rope_animate++;
@@ -491,7 +511,7 @@ int main()
 			if (state != 3 && state != 4)
 			{
 
-				player.setScale(1.f, 1.f);
+				player_rotate = 1;
 				player.setPosition(player.x - 1.5, player.y);
 
 				if (state != 2)
@@ -513,7 +533,8 @@ int main()
 			if (state != 3 && state != 4)
 			{
 
-				player.setScale(-1.f, 1.f);
+
+				player_rotate = -1;
 				player.setPosition(player.x + 1.5, player.y);
 
 				if (state != 2)
@@ -540,7 +561,14 @@ int main()
 		}
 
 
-
+		if (player_rotate == 1)
+		{
+			player.setScale(1.f, 1.f);
+		}
+		else if(player_rotate == -1)
+		{
+			player.setScale(-1.f, 1.f);
+		}
 
 	
 
@@ -553,15 +581,15 @@ int main()
 			float camera_ty = camera.getCenter().y + (player.y - camera.getCenter().y) / 60;
 
 
-		if (camera_tx - camera.getSize().x / 2 >0&& camera_tx + camera.getSize().x / 2 < 1980)
-		{
-			camera.setCenter(Vector2f(camera.getCenter().x+ (player.x-camera.getCenter().x)/60 , camera.getCenter().y));
-		}
+			if (camera_tx - camera.getSize().x / 2 > 0 && camera_tx + camera.getSize().x / 2 < 1980)
+			{
+				camera.setCenter(Vector2f(camera.getCenter().x + (player.x - camera.getCenter().x) / 60, camera.getCenter().y));
+			}
 
-		if (camera_ty - camera.getSize().y / 2 > 0 && camera_ty + camera.getSize().y / 2 < 1230)
-		{
-			camera.setCenter(Vector2f(camera.getCenter().x, camera.getCenter().y + (player.y - camera.getCenter().y) / 60));
-		}
+			if (camera_ty - camera.getSize().y / 2 > 0 && camera_ty + camera.getSize().y / 2 < 1230)
+			{
+				camera.setCenter(Vector2f(camera.getCenter().x, camera.getCenter().y + (player.y - camera.getCenter().y) / 60));
+			}
 
 
 
@@ -575,6 +603,28 @@ int main()
 			GUI.setPosition(posInView_x, posInView_y + 530);
 			crash.setPosition(Vector2f(player.x, player.y + 10 + player_speed));
 			rope_crash.setPosition(Vector2f(player.x, player.y + 20));
+		}
+
+
+		//카메라 설정
+		{
+			if (state == 3)
+			{
+				if (player_rotate == 1)
+				{
+
+					attach.setPosition(Vector2f(player.x - 100, player.y - 50));
+				}
+				else if (player_rotate == -1)
+				{
+					attach.setPosition(Vector2f(player.x, player.y - 50));
+				}
+			}
+			else
+			{
+				attach.setPosition(Vector2f(-500, -500));
+			}
+
 
 
 			mouse_pos = Mouse::getPosition(window);
@@ -604,11 +654,16 @@ int main()
 			{
 
 				monster_vector[i].schedule();
+				monster_vector[i].player_x = player.x;
+				monster_vector[i].player_y = player.y;
 				window.draw(monster_vector[i].getSprite());
+
+
 
 			}
 
 			window.draw(player.getSprite());
+			window.draw(attach);
 			window.draw(crash);
 			window.draw(rope_crash);
 			window.draw(GUI_background.getSprite());

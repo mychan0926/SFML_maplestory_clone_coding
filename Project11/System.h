@@ -57,10 +57,22 @@ public:
 	int die_counting = 0;
 	int targetx = 0;
 	int T_clock = 100;
+	int R_clock = 100;
 	int A_clock = 0;
+	int live_clock = 0;
+	int damage_clock = 0;
+	int texture_clock = 80;
+	int death_clock = 0;
+	bool damage_trigger=0;
+
+	float player_x;
+	float player_y;
+
+
+	RectangleShape* playero;
 	vector <Texture> monster_texture;
 
-	monster(double input_x, double input_y, Texture input_texture) : object(input_x, input_y, input_texture) { apply(); schedule(); }
+	monster(double input_x, double input_y, Texture input_texture) : object(input_x, input_y, input_texture) { apply();  }
 	void setHp(int input_hp);
 	void move_animate();
 	void setDamage(int input_damage);
@@ -70,6 +82,7 @@ public:
 	void die();
 	void schedule();
 	void is_damaged(int input_damage);
+	bool is_crash(RectangleShape *T);
 
 	int getHp();
 	int getDamage();

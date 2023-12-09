@@ -54,7 +54,6 @@ using namespace sf;
 
 		objectSprite.setScale(scalex,scaley);
 	}
-
 	void monster::setHp(int input_hp)
 	{
 		hp = input_hp;
@@ -97,7 +96,7 @@ using namespace sf;
 
 	void monster::move(int input_gox)
 	{
-		if (x != input_gox)
+		if (x != input_gox&& texture_clock == 80)
 		{
 			if (x < input_gox)
 			{
@@ -111,7 +110,7 @@ using namespace sf;
 			}
 			move_animate();
 		}
-		else
+		else if (x == input_gox)
 		{
 			move_counting = 1;
 			setTexture(monster_texture[0]);
@@ -120,6 +119,41 @@ using namespace sf;
 	}
 	void monster::die()
 	{
+		if (live_clock == 179)
+		{
+			setTexture(monster_texture[0]);
+			T_clock = 100;
+			R_clock = 100;
+			damage_clock = 0;
+			texture_clock = 80;
+			death_clock = 0;
+			damage_trigger = 0;
+			live_clock = 0;
+			hp = 100;
+		}
+		else
+		{
+			live_clock++;
+		}
+
+		if (live_clock == 40)
+		{
+			setTexture(monster_texture[0]);
+			x = startx + rand() % (endx - startx);
+		}
+		if (live_clock > 50&& live_clock <= 178)
+		{
+			getSprite().setColor(sf::Color(255, 255, 255, (live_clock - 50) * 2));
+		}
+
+
+		if (live_clock==20)
+		{
+			setPosition(-1000,y);
+		}
+
+
+	
 
 	}
 	void monster::move_animate()
@@ -148,10 +182,74 @@ using namespace sf;
 	{
 		if (hp <= 0)
 		{
-			die();
+			if (death_clock == 60)
+			{
+				die();
+			}
+			else if (death_clock == 0)
+			{
+				setTexture(monster_texture[5]);
+			}
+			else if (death_clock == 20)
+			{
+				setTexture(monster_texture[6]);
+			}
+			else if (death_clock == 40)
+			{
+				setTexture(monster_texture[7]);
+			}
+
+			if(death_clock!=60)
+			{
+				death_clock++;
+			}
+			
+
 		}
 		else
 		{
+			if (texture_clock != 80)
+			{
+				
+	
+				if (texture_clock == 0)
+				{
+					setTexture(monster_texture[3]);
+
+					
+				}
+				if (texture_clock > 0 && texture_clock < 30)
+				{
+					if (player_x < x)
+					{
+						if (x < endx)
+						{
+
+							setPosition(x + 1, y);
+						}
+					}
+					else
+					{
+						if (x >startx)
+						{
+
+							setPosition(x - 1, y);
+						}
+					}
+				}
+				if (texture_clock == 49)
+				{
+					setTexture(monster_texture[0]);
+					targetx = startx + rand() % (endx - startx);
+					T_clock = 150;
+					move_counting = 0;
+				}
+
+				texture_clock++;
+
+
+			}
+
 			if (T_clock == 200)
 			{
 				move(targetx);
@@ -165,9 +263,23 @@ using namespace sf;
 			}
 			else
 			{
+
 				T_clock++;
 			}
 
+			if (damage_clock == 2)
+			{
+				damage_clock = 0;
+				if (is_crash(playero)&& texture_clock == 80)
+				{
+					is_damaged(50);
+				}
+			}
+			else
+			{
+				damage_clock++;
+
+			}
 		}
 	
 	}
@@ -175,8 +287,18 @@ using namespace sf;
     void monster::is_damaged(int input_damage)
 
 	{
+		texture_clock = 0;
+		damage_trigger = 1;
 		hp -= input_damage;
 	}
+
+	bool monster::is_crash(RectangleShape *T)
+	{
+
+		return this->getSprite().getGlobalBounds().intersects(T->getGlobalBounds());
+	}
+
+
 	pair<double, double> object:: getPosition()
 	{
 		return { x,y };
