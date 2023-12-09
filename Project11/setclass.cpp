@@ -172,7 +172,11 @@ using namespace sf;
 	
 	}
 
+commit	void monster::is_damaged(int input_damage)
 
+	{
+		hp -= input_damage;
+	}
 	pair<double, double> object:: getPosition()
 	{
 		return { x,y };

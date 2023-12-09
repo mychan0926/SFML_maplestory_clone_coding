@@ -48,10 +48,10 @@ public:
 class monster : public object
 {
 private:
-	int hp;
-	int damage;
-	int startx;
-	int endx;
+	int hp=1;
+	int damage=0;
+	int startx=0;
+	int endx=0;
 public:
 	int move_counting = 0;
 	int die_counting = 0;
@@ -69,7 +69,7 @@ public:
 	void move(int input_gox);
 	void die();
 	void schedule();
-
+	void is_damaged(int input_damage);
 
 	int getHp();
 	int getDamage();

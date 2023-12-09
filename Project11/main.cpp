@@ -248,6 +248,7 @@ int main()
 		T_monster.monster_texture.push_back(monster_move2);
 		T_monster.monster_texture.push_back(monster_move3);
 		T_monster.monster_texture.push_back(monster_back);
+		T_monster.setTexture(monster_move1);
 		T_monster.setCenter(T_monster.getSprite().getLocalBounds().width / 2, T_monster.getSprite().getLocalBounds().height / 230);
 		monster_vector.push_back(T_monster);
 
@@ -306,6 +307,8 @@ int main()
 			{
 				state = 3;
 			}
+
+
 		}
 		if (Keyboard::isKeyPressed(Keyboard::Up))
 		{
