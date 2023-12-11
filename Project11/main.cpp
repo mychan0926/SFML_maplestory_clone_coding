@@ -20,6 +20,8 @@ int rope_animate = 0;
 bool one_count = 0;
 int player_rotate = 0;
 int is_rope = 0;
+int effect_clock = 60;
+int player_skill = 0;
 Texture playertx_wait;
 Texture playertx_walk1;
 Texture playertx_walk2;
@@ -52,6 +54,10 @@ Texture playertx_attack33;
 
 //=============================
 
+
+
+
+vector <Texture> effect_tx;
 
 object player(500, 500, playertx_wait);
 void d()
@@ -172,9 +178,15 @@ int main()
 	View camera(FloatRect(0, 0, 800, 600));
 	window.setView(camera);
 
+	Sound s;
+	Sound s1;
+	Sound s2;
+	Sound s3;
 
-
-
+	SoundBuffer Sattack;
+	SoundBuffer Snormalattack;
+	SoundBuffer Slevel;
+	SoundBuffer Sjump;
 
 	playertx_wait.loadFromFile("./texture_asset/메이플 에셋/서기/avatar_stand1(0)_default(0).png");
 	playertx_walk1.loadFromFile("./texture_asset/메이플 에셋/걷기/avatar_walk1(0)_default(0).png");
@@ -200,14 +212,35 @@ int main()
 	guitx.loadFromFile("./texture_asset/level.png");
 	guibacktx.loadFromFile("./texture_asset/_outlink.png");
 
+	Sattack.loadFromFile("./texture_asset/메이플 에셋/이펙트/Use.wav");
+	Snormalattack.loadFromFile("./texture_asset/메이플 에셋/이펙트/Attack.wav");
+	Sjump.loadFromFile("./texture_asset/메이플 에셋/이펙트/Jump.wav");
+	Slevel.loadFromFile("./texture_asset/메이플 에셋/이펙트/LevelUp.wav");
+	s.setBuffer(Sattack);
+	s1.setBuffer(Snormalattack);
+	s2.setBuffer(Sjump);
+	s3.setBuffer(Slevel);
+	Music M;
+	M.openFromFile("./texture_asset/메이플 에셋/이펙트/FloralLife.wav");
 
 
+	for (int i = 0; i < 11; i++)
+	{
+		Texture T;
+		T.loadFromFile("./texture_asset/메이플 에셋/이펙트/"+ to_string(i*60)+'_'+to_string((i+1)*60)+".png");
+		effect_tx.push_back(T);
+
+
+	}
+	
 
 
 
 	object map(0, 0, maptx);
 	object GUI(500, 500, guitx);
 	object GUI_background(500, 500, guibacktx);
+	object effect(-1000, -1000, effect_tx[0]);
+
 	vector <RectangleShape> road;
 	vector <vector<float>> road_pos;
 	road_pos = { {2000, 100,0, 1035}, {500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,520, 612},{130, 10,970, 612},{310, 10,1150, 612} ,{310, 10,700, 432} ,{220, 10,1060, 432},{310, 10,880, 252} };
@@ -218,23 +251,25 @@ int main()
 
 	vector <monster> monster_vector;
 	vector <vector<float>> 	monster_pos;
-	monster_pos = {{500, 10,330, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,520, 612},{130, 10,970, 612},{310, 10,1150, 612} ,{310, 10,700, 432} ,{220, 10,1060, 432},{310, 10,880, 252} };
+	monster_pos = {{500, 10,330, 790},{500, 10,330, 790},{500, 10,330, 790},{310, 10,875, 790},{310, 10,875, 790},{310, 10,875, 790},{400, 10,1240, 790},{400, 10,1240, 790},{400, 10,520, 612},{400, 10,520, 612},{400, 10,520, 612},{130, 10,970, 612},{130, 10,970, 612},{310, 10,1150, 612} ,{310, 10,700, 432} ,{220, 10,1060, 432},{310, 10,880, 252} };
 
 	RectangleShape crash;
 	RectangleShape rope_crash;
 	RectangleShape attach;
-
+	RectangleShape exp_backbar;
+	RectangleShape exp_bar;
 
 	crash.setSize(Vector2f(7, 5));
 	rope_crash.setSize(Vector2f(7, 5));
 	attach.setSize(Vector2f(100, 50));
+	exp_backbar.setSize(Vector2f(300, 15));
 
 
-	crash.setFillColor(sf::Color(255, 255, 255, 100));
-	rope_crash.setFillColor(sf::Color(255, 255, 255, 100));
-	attach.setFillColor(sf::Color(255, 0, 255, 100));
-
-
+	crash.setFillColor(sf::Color(255, 255, 255, 0));
+	rope_crash.setFillColor(sf::Color(255, 255, 255, 0));
+	attach.setFillColor(sf::Color(255, 0, 255, 0));
+	exp_backbar.setFillColor(sf::Color::Black);
+	exp_bar.setFillColor(sf::Color::Green);
 
 	//땅 생성
 	for (int i = 0; i < road_pos.size(); i++)
@@ -242,7 +277,7 @@ int main()
 		RectangleShape T_road;
 		T_road.setSize(Vector2f(road_pos[i][0], road_pos[i][1]));
 		T_road.setPosition(Vector2f(road_pos[i][2], road_pos[i][3]));
-		T_road.setFillColor(sf::Color(255, 255, 255, 100));
+		T_road.setFillColor(sf::Color(255, 255, 255, 0));
 		road.push_back(T_road);
 
 	}
@@ -252,10 +287,12 @@ int main()
 		RectangleShape T_ladder;
 		T_ladder.setSize(Vector2f(ladder_pos[i][0]-10, ladder_pos[i][1]));
 		T_ladder.setPosition(Vector2f(ladder_pos[i][2]+5, ladder_pos[i][3]+1));
-		T_ladder.setFillColor(sf::Color(0, 0, 255, 100));
+		T_ladder.setFillColor(sf::Color(0, 0, 255, 0));
 		ladder.push_back(T_ladder);
 
 	}
+
+
 	//몬스터 생성
 	for (int i = 0; i < monster_pos.size(); i++)
 	{
@@ -282,7 +319,7 @@ int main()
 	}
 
 	bool is_road = 0;
-
+	M.play();
 
 	while (window.isOpen())
 	{
@@ -304,6 +341,7 @@ int main()
 						player_speed -= 2;
 						jumped = 1;
 						down_counting = 0;
+						s2.play();
 					}
 				}
 				else//19 24
@@ -313,6 +351,7 @@ int main()
 						player_speed -= 2;
 						jumped = 1;
 						jump_counting = 0;
+						s2.play();
 					}
 
 				}
@@ -325,6 +364,7 @@ int main()
 					player_speed -= 4;
 					jumped = 1;
 					jump_counting = 0;
+					s2.play();
 				}
 			}
 
@@ -335,10 +375,54 @@ int main()
 			if (state != 2&&state!=3 && state != 4)
 			{
 				state = 3;
+				player_skill = 0;
+				s1.play();
 			}
 
 
 		}
+		if (Keyboard::isKeyPressed(Keyboard::F)) {
+			if (state != 2 && state != 3 && state != 4)
+			{
+				state = 3;
+				effect_clock = 0;
+				player_skill = 1;
+				s.play();
+			}
+
+
+		}
+
+		if (effect_clock == 0)
+		{
+			if (player_rotate == 1)
+			{
+				effect.setScale(1, 1);
+				effect.setPosition(player.x - 420, player.y - 140);
+			}
+			else
+			{
+				effect.setScale(-1, 1);
+				effect.setPosition(player.x + 420, player.y - 140);
+			}
+		
+			effect.setTexture(effect_tx[0]);
+		}
+		if (effect_clock %(60/ effect_tx.size())==0)
+		{
+			effect.setTexture(effect_tx[effect_clock / (60 / effect_tx.size())]);
+
+		}
+		if (effect_clock == 60)
+		{
+			effect.setPosition(-500, -500);
+		}
+		else
+		{
+			effect_clock++;
+		}
+
+
 		if (Keyboard::isKeyPressed(Keyboard::Up))
 		{
 			//로프 충돌 처리
@@ -594,14 +678,14 @@ int main()
 		
 
 		player_animate_change();
-		
+		exp_bar.setSize(Vector2f(((float)(player_EXP) /(player_level * 40 + 100))*300, 15));
 
 
-		if (player_EXP >= player_level * 20 + 100)
+		if (player_EXP >= player_level * 40 + 100)
 		{
-			player_EXP -= player_level * 20 + 100;
+			player_EXP -= player_level * 40 + 100;
 			player_level++;
-
+			s3.play();
 		}
 
 		//카메라 설정
@@ -632,22 +716,49 @@ int main()
 			GUI.setPosition(posInView_x, posInView_y + 530);
 			crash.setPosition(Vector2f(player.x, player.y + 10 + player_speed));
 			rope_crash.setPosition(Vector2f(player.x, player.y + 20));
+			exp_backbar.setPosition(Vector2f(posInView_x +220, posInView_y + 575));
+			exp_bar.setPosition(Vector2f(posInView_x + 220, posInView_y + 575));
+
+
 		}
+
 
 
 		//카메라 설정
 		{
 			if (state == 3)
 			{
-				if (player_rotate == 1)
+				if (effect_clock != 60)
 				{
+					attach.setSize(Vector2f(400, 100));
+					if (player_rotate == 1)
+					{
 
-					attach.setPosition(Vector2f(player.x - 100, player.y - 50));
+						attach.setPosition(Vector2f(player.x - 400, player.y - 100));
+
+					}
+					else if (player_rotate == -1)
+					{
+						attach.setPosition(Vector2f(player.x, player.y - 100));
+					}
+
 				}
-				else if (player_rotate == -1)
+				else
 				{
-					attach.setPosition(Vector2f(player.x, player.y - 50));
+					attach.setSize(Vector2f(100, 50));
+					if (player_rotate == 1)
+					{
+
+						attach.setPosition(Vector2f(player.x - 100, player.y - 50));
+
+					}
+					else if (player_rotate == -1)
+					{
+						attach.setPosition(Vector2f(player.x, player.y - 50));
+					}
+
 				}
+
 			}
 			else
 			{
@@ -686,6 +797,7 @@ int main()
 				monster_vector[i].player_x = player.x;
 				monster_vector[i].player_y = player.y;
 				monster_vector[i].player_damage = player_level*5+20;
+				monster_vector[i].player_skill = player_skill;
 				window.draw(monster_vector[i].getSprite());
 
 			}
@@ -693,9 +805,12 @@ int main()
 			window.draw(player.getSprite());
 			window.draw(attach);
 			window.draw(crash);
+			window.draw(effect.getSprite());
 			window.draw(rope_crash);
 			window.draw(GUI_background.getSprite());
 			window.draw(GUI.getSprite());
+			window.draw(exp_backbar);
+			window.draw(exp_bar);
 			window.draw(text);
 			window.display();
 

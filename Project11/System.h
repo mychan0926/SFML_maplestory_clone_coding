@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -65,17 +66,24 @@ public:
 	int texture_clock = 80;
 	int death_clock = 0;
 	int re_clock = 0;
-
+	int player_skill=0;
 	bool damage_trigger=0;
 
 	float player_x;
 	float player_y;
 	int player_damage = 0;
 
+
 	RectangleShape* playero;
 	vector <Texture> monster_texture;
 
-	monster(double input_x, double input_y, Texture input_texture) : object(input_x, input_y, input_texture) { apply();  }
+	monster(double input_x, double input_y, Texture input_texture) : object(input_x, input_y, input_texture)
+	{ 
+
+
+
+		apply();
+	}
 	void setHp(int input_hp);
 	void move_animate();
 	void setDamage(int input_damage);

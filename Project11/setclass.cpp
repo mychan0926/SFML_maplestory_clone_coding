@@ -287,7 +287,14 @@ using namespace sf;
 				damage_clock = 0;
 				if (is_crash(playero)&& texture_clock == 80)
 				{
-					is_damaged(50);
+					if (player_skill == 0)
+					{
+						is_damaged(30+damage);
+					}
+					else if (player_skill == 1)
+					{
+						is_damaged(50+damage);
+					}
 				}
 			}
 			else
